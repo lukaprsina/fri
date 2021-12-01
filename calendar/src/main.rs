@@ -1,6 +1,6 @@
 use std::io;
 
-fn read_n_lines(n: usize) -> Vec<String> {
+fn read_n_lines(n: i32) -> Vec<String> {
     let mut lines = Vec::new();
     for _ in 0..n {
         let mut line = String::new();
@@ -11,7 +11,7 @@ fn read_n_lines(n: usize) -> Vec<String> {
 }
 
 fn main() {
-    let n = read_n_lines(1)[0].parse::<usize>().unwrap();
+    let n = read_n_lines(1)[0].parse::<i32>().unwrap();
     let mut names = read_n_lines(n);
     let separator = &read_n_lines(1)[0];
 
