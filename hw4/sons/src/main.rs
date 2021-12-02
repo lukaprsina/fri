@@ -1,25 +1,27 @@
-use std::io;
+use std::{
+    fs::{write, File},
+    io::{prelude::*, BufReader},
+    path::Path,
+};
 
-fn read_n_lines(n: usize) -> Vec<String> {
-    let mut lines = Vec::new();
-    for _ in 0..n {
-        let mut line = String::new();
-        io::stdin().read_line(&mut line).unwrap();
-        lines.push(line.trim().to_string());
-    }
-    lines
+fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
+    let file = File::open(filename).expect("no such file");
+    let buf = BufReader::new(file);
+    buf.lines()
+        .map(|l| l.expect("Could not parse line"))
+        .collect()
 }
 
 fn main() {
-    println!("NEWWWWWW\n\n\n");
-    let numbers: Vec<usize> = read_n_lines(1)[0]
+    let lines = lines_from_file("input.txt");
+    let numbers: Vec<usize> = lines[0]
         .split(" ")
         .map(|number_str| number_str.parse::<usize>().unwrap())
         .collect();
     let n = numbers[0];
-    let _m = numbers[0];
+    let m = numbers[1];
 
-    let field = read_n_lines(n)
+    let field = lines[1..(1 + n)]
         .iter()
         .map(|n_iter| {
             n_iter
@@ -29,44 +31,49 @@ fn main() {
         })
         .collect::<Vec<Vec<usize>>>();
 
-    let portions = read_n_lines(1)[0]
+    let portions = lines[1 + n]
         .split(" ")
         .map(|portion| portion.parse::<usize>().unwrap())
         .collect::<Vec<usize>>();
 
     let mut result = 0;
     calculate_row(&field, &portions, &mut result);
-    println!("{}", result);
-}
 
-fn calculate_row(field: &Vec<Vec<usize>>, portions: &Vec<usize>, result: &mut i32) -> bool {
-    let mut found: bool = false;
-    if portions.len() == 0 {
-        found = true;
+    let mut temp_field: Vec<Vec<usize>> = Vec::new();
+
+    for i in 0..m {
+        let mut temp_column = Vec::new();
+        for j in 0..n {
+            temp_column.push(field[j][i]);
+        }
+        temp_field.push(temp_column);
     }
 
-    field.iter().enumerate().for_each(|(row_num, row)| {
-        let sum = row.iter().sum();
+    calculate_row(&temp_field, &portions, &mut result);
+    write("output.txt", result.to_string()).unwrap();
+}
+
+fn calculate_row(field: &Vec<Vec<usize>>, portions: &Vec<usize>, result: &mut i32) {
+    let mut sum = 0;
+
+    if field.len() == 0 && portions.len() == 0 {
+        *result += 1;
+    }
+
+    for (row_num, row) in field.iter().enumerate() {
+        sum += row.iter().sum::<usize>();
 
         if let Some(portion_num) = portions.iter().position(|&x| x == sum) {
             let mut temp_portions = portions.clone();
             let mut temp_field = field.clone();
 
-            println!("New iteration:\n{:?}\n{:?}", field, portions);
-
             temp_portions.remove(portion_num);
-            temp_field.remove(row_num);
 
-            found = calculate_row(&temp_field, &temp_portions, result);
+            for _ in 0..=row_num {
+                temp_field.remove(0);
+            }
+
+            calculate_row(&temp_field, &temp_portions, result);
         }
-
-        println!("Ending row: {:?}\n\n", row_num);
-    });
-
-    if found {
-        *result += 1;
-        println!("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE: {}", result);
     }
-
-    found
 }
