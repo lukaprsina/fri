@@ -12,15 +12,14 @@ fn read_n_lines(n: usize) -> Vec<String> {
 
 #[derive(Debug)]
 struct Employee {
-    l: i32,
-    r: i32,
-    s: i32,
+    low: i64,
+    high: i64,
 }
 
 #[derive(Debug)]
 struct TestCase {
-    n: i32,
-    s: i32,
+    n: i64,
+    s: i64,
     e: Vec<Employee>,
 }
 
@@ -30,7 +29,7 @@ fn main() {
     let mut test_cases: Vec<TestCase> = Vec::new();
 
     for i in 0..t {
-        let n_and_s: Vec<i32> = read_n_lines(1)[0]
+        let n_and_s: Vec<i64> = read_n_lines(1)[0]
             .split(" ")
             .map(|num| num.parse().unwrap())
             .collect();
@@ -40,34 +39,53 @@ fn main() {
             e: Vec::new(),
         });
         for _ in 0..n_and_s[0] {
-            let l_and_r: Vec<i32> = read_n_lines(1)[0]
+            let l_and_r: Vec<i64> = read_n_lines(1)[0]
                 .split(" ")
                 .map(|num| num.parse().unwrap())
                 .collect();
             test_cases[i as usize].e.push(Employee {
-                l: l_and_r[0],
-                r: l_and_r[1],
-                s: 0,
+                low: l_and_r[0],
+                high: l_and_r[1],
             });
         }
     }
 
-    test_cases.iter_mut().for_each(|test_case| {
-        test_case.e.sort_by(|a, b| a.l.cmp(&b.l));
-        println!("{:?}", &test_case);
+    test_cases
+        .iter_mut()
+        .enumerate()
+        .for_each(|(_test_pos, test_case)| {
+            test_case.e.sort_by(|a, b| b.low.cmp(&a.low));
+            // println!("{:?}", &test_case);
 
-        let mut median = (test_case.e.len() as f32 / 2.0f32).ceil() as i32 - 1;
-        let mut temp_sal = test_case.e[median as usize].l;
+            let mut low = 1;
+            let mut high = 10e9 as i64 + 1;
 
-        // test_case.e.iter().enumerate().for_each(|(pos, e)| {});
+            while high - low > 1 {
+                let mid = (low + high) / 2;
+                let mut remaining_money = test_case.s;
+                let mut median_pos = (test_case.n as f64 / 2f64).ceil() as i32;
 
-        let found = false;
-        while !found {
-            if temp_sal < test_case.e[(median as usize) + 1].s {
-                test_case.e[median as usize].s += 1;
+                for employee in &test_case.e {
+                    let mut temp_salary = employee.low;
+
+                    if median_pos > 0 && employee.high >= mid {
+                        median_pos -= 1;
+                        temp_salary = mid.max(employee.low);
+                    }
+
+                    remaining_money -= temp_salary;
+                }
+
+                if remaining_money >= 0 && median_pos == 0 {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
             }
-        }
-    });
 
-    println!("{:?}", &test_cases);
+            // println!("Case #{}: low: {}, high: {}", test_pos + 1, low, high);
+            println!("{}", low);
+        });
+
+    // println!("{:?}", &test_cases);
 }
