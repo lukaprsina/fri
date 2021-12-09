@@ -12,9 +12,9 @@ fn read_n_lines(n: usize) -> Vec<String> {
 
 #[derive(Debug)]
 struct Employee {
-    l: i32,
-    r: i32,
-    s: i32,
+    low: i32,
+    high: i32,
+    salary: i32,
 }
 
 #[derive(Debug)]
@@ -45,26 +45,29 @@ fn main() {
                 .map(|num| num.parse().unwrap())
                 .collect();
             test_cases[i as usize].e.push(Employee {
-                l: l_and_r[0],
-                r: l_and_r[1],
-                s: 0,
+                low: l_and_r[0],
+                high: l_and_r[1],
+                salary: l_and_r[0],
             });
         }
     }
 
     test_cases.iter_mut().for_each(|test_case| {
-        test_case.e.sort_by(|a, b| a.l.cmp(&b.l));
+        test_case.e.sort_by(|a, b| a.salary.cmp(&b.salary));
         println!("{:?}", &test_case);
 
-        let mut median = (test_case.e.len() as f32 / 2.0f32).ceil() as i32 - 1;
-        let mut temp_sal = test_case.e[median as usize].l;
+        let mut median = (test_case.e.len() as f32 / 2.0f32).ceil() as usize - 1 as usize;
 
-        // test_case.e.iter().enumerate().for_each(|(pos, e)| {});
-
-        let found = false;
-        while !found {
-            if temp_sal < test_case.e[(median as usize) + 1].s {
-                test_case.e[median as usize].s += 1;
+        // can fail
+        loop {
+            if test_case.e[median].salary > test_case.e[median + 1].salary {
+                test_case.e.sort_by(|a, b| a.salary.cmp(&b.salary));
+            } else {
+                if test_case.e[median].salary < test_case.e[median].high {
+                    test_case.e[median].salary += 1;
+                } else {
+                    panic!("{:?}", test_case);
+                }
             }
         }
     });
