@@ -43,23 +43,27 @@ fn read_n_lines(n: usize) -> Vec<String> {
 
 fn longest_common_substring(first: &str, second: &str) -> i64 {
     let mut result = 0i64;
-    let mut LCSuff: Vec<i64> = Vec::new();
+    let mut suff: Vec<Vec<i64>> = vec![vec![0; second.len() + 1]; first.len() + 1];
 
-    first.chars().enumerate().for_each(|(f_pos, _f)| {
-        second.chars().enumerate().for_each(|(s_pos, _s)| {
-            if f_pos == 0 || s_pos == 0 {
-                LCSuff.insert(f_pos * (first.len() + 1) + s_pos, 0);
-            } else if first.chars().nth(f_pos - 1).unwrap()
-                == second.chars().nth(s_pos - 1).unwrap()
-            {
-                LCSuff[f_pos * (first.len() + 1) + s_pos] =
-                    LCSuff[(f_pos - 1) * (first.len() + 1) + s_pos - 1] + 1;
-                result = max(result, LCSuff[f_pos * (first.len() + 1) + s_pos]);
+    for i in 0..=first.len() {
+        for j in 0..=second.len() {
+            if i == 0 || j == 0 {
+                suff[i][j] = 0;
+            } else if first.chars().nth(i - 1).unwrap() == second.chars().nth(j - 1).unwrap() {
+                suff[i][j] = suff[i - 1][j - 1] + 1;
+                result = result.max(suff[i][j]);
             } else {
-                LCSuff.insert(f_pos * (first.len() + 1) + s_pos, 0);
+                suff[i][j] = 0;
             }
-        });
-    });
+        }
+    }
+
+    /* println!(
+        "{:?}",
+        suff.iter().for_each(|line| {
+            println!("{:?}", line);
+        })
+    ); */
 
     result
 }
@@ -82,6 +86,13 @@ fn main() {
     for i in second.0..=second.1 {
         second_str.push(get_char(into_aba(i as i64) as u8));
     }
+
+    /* println!(
+        "a: {}, b: {}, num: {}",
+        &first_str,
+        &second_str,
+        longest_common_substring(&first_str, &second_str)
+    ); */
 
     println!("{}", longest_common_substring(&first_str, &second_str));
 }

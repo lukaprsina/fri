@@ -12,14 +12,8 @@ fn read_n_lines(n: usize) -> Vec<String> {
 
 #[derive(Debug)]
 struct Employee {
-<<<<<<< HEAD
-    low: i32,
-    high: i32,
-    salary: i32,
-=======
     low: i64,
     high: i64,
->>>>>>> 5ab71a413c537f8d8658e456e1dda33871bb5c60
 }
 
 #[derive(Debug)]
@@ -52,31 +46,10 @@ fn main() {
             test_cases[i as usize].e.push(Employee {
                 low: l_and_r[0],
                 high: l_and_r[1],
-<<<<<<< HEAD
-                salary: l_and_r[0],
-=======
->>>>>>> 5ab71a413c537f8d8658e456e1dda33871bb5c60
             });
         }
     }
 
-<<<<<<< HEAD
-    test_cases.iter_mut().for_each(|test_case| {
-        test_case.e.sort_by(|a, b| a.salary.cmp(&b.salary));
-        println!("{:?}", &test_case);
-
-        let mut median = (test_case.e.len() as f32 / 2.0f32).ceil() as usize - 1 as usize;
-
-        // can fail
-        loop {
-            if test_case.e[median].salary > test_case.e[median + 1].salary {
-                test_case.e.sort_by(|a, b| a.salary.cmp(&b.salary));
-            } else {
-                if test_case.e[median].salary < test_case.e[median].high {
-                    test_case.e[median].salary += 1;
-                } else {
-                    panic!("{:?}", test_case);
-=======
     test_cases
         .iter_mut()
         .enumerate()
@@ -107,7 +80,6 @@ fn main() {
                     low = mid;
                 } else {
                     high = mid;
->>>>>>> 5ab71a413c537f8d8658e456e1dda33871bb5c60
                 }
             }
 
